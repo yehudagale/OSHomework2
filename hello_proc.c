@@ -2,7 +2,7 @@
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
 #include <linux/vmalloc.h>
-#include <asm-generic/uaccess.h>
+#include <linux/uaccess.h>
 
 MODULE_LICENSE("GPL");  /* Kernel needs this license. */
 
@@ -18,7 +18,7 @@ ssize_t procfile_write(struct file *filp, const char __user *buf, size_t count,
                 loff_t *f_pos);
 
 /* Global variables go here */
-int have_written_to_file;
+char text_written[80];
 /* This global structure is necessary to bind the regular file read and write 
  * operations to our special "read" and "write" functions instead. Don't
  * modify. (structs in C are like objects in other languages.)
@@ -37,7 +37,6 @@ int hello_proc_init(void) {
    
    /* This message will print in /var/log/syslog or on the first tty. */
    printk("/proc/%s created\n", ENTRY_NAME);
-   have_written_to_file = 0;
    return 0;
 }
 
@@ -63,13 +62,13 @@ ssize_t procfile_read(struct file *filp, char __user *buf, size_t count, loff_t 
    finished = 1;
 
    /* This message will print in /var/log/syslog or on the first tty. */
-   printk("/proc/%s read called. read %d\n", ENTRY_NAME, have_written_to_file);
+   printk("/proc/%s read called. read\n", ENTRY_NAME);
 
 
    /* Take the string "Hello World!\n" and put it in ret_buf.  Copy ret_buf
       into the user-space buffer called buf.  buf is what gets
     * displayed to the user when they read the file. */
-   ret = sprintf(ret_buf, "Hello world!%d\n", have_written_to_file);
+   ret = sprintf(ret_buf, "%s", text_written);
    if(copy_to_user(buf, ret_buf, ret)) {
       ret = -EFAULT;  //failed, let's get out of here
    }
@@ -98,7 +97,8 @@ ssize_t procfile_write(struct file *filp, const char __user *buf, size_t count, 
 
    /* Now do something with the data, here we just print it */
     printk("User has sent the value of %s\n", page);
-    have_written_to_file = 1;
+    if(strlen(page) < 80)
+    sprintf(text_written, "%s", page);
     /* Free the allocated memory, don't touch. */
     vfree(page); 
 

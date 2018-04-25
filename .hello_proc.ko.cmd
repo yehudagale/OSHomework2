@@ -1,0 +1,1 @@
+cmd_/home/yehuda_gale/OSHomework2/hello_proc.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/yehuda_gale/OSHomework2/hello_proc.ko /home/yehuda_gale/OSHomework2/hello_proc.o /home/yehuda_gale/OSHomework2/hello_proc.mod.o ;  true

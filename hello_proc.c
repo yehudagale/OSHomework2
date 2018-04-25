@@ -6,7 +6,7 @@
 
 MODULE_LICENSE("GPL");  /* Kernel needs this license. */
 
-#define ENTRY_NAME "helloworld"
+#define ENTRY_NAME "remember"
 #define PERMS 0644
 #define PARENT NULL
 
@@ -94,11 +94,7 @@ ssize_t procfile_write(struct file *filp, const char __user *buf, size_t count, 
        vfree(page);
        return -EFAULT;
     }
-
-   /* Now do something with the data, here we just print it */
-    printk("User has sent the value of %s\n", page);
-    if(strlen(page) < 80)
-    sprintf(text_written, "%s", page);
+    sprintf(text_written, "%s\0",  page);
     /* Free the allocated memory, don't touch. */
     vfree(page); 
 
